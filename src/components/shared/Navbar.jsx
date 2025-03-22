@@ -18,16 +18,20 @@ const Navbar = () => {
     const logoutHandler = async () => {
         try {
             const res = await axios.get(`${USER_API_END_POINT}/logout`, { withCredentials: true });
-            if (res.data.success) {
+            if (res?.data?.success) {
                 dispatch(setUser(null));
+                localStorage.removeItem("authToken"); // Ensure token removal
                 navigate("/");
-                toast.success(res.data.message);
+                toast.success(res.data.message || "Logged out successfully");
+            } else {
+                toast.error("Logout failed. Please try again.");
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
+            console.error("Logout Error:", error);
+            toast.error(error?.response?.data?.message || "An error occurred while logging out");
         }
     }
+    
     return (
         <div className='bg-white'>
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
@@ -50,8 +54,6 @@ const Navbar = () => {
                                 </>
                             )
                         }
-
-
                     </ul>
                     {
                         !user ? (
@@ -86,7 +88,6 @@ const Navbar = () => {
                                                     </div>
                                                 )
                                             }
-
                                             <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                                 <LogOut />
                                                 <Button onClick={logoutHandler} variant="link">Logout</Button>
@@ -97,12 +98,10 @@ const Navbar = () => {
                             </Popover>
                         )
                     }
-
                 </div>
             </div>
-
         </div>
     )
 }
 
-export default Navbar
+export default Navbar;
